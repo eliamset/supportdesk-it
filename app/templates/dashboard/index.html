@@ -1,0 +1,93 @@
+{% extends "base.html" %}
+
+{% block title %}Dashboard{% endblock %}
+{% block page_title %}Dashboard{% endblock %}
+
+{% block content %}
+<div class="row g-4 mb-4">
+    <div class="col-md-4">
+        <div class="card stat-card border-primary p-3">
+            <div class="d-flex align-items-center">
+                <div class="rounded-circle bg-primary bg-opacity-10 p-3 me-3">
+                    <i class="bi bi-ticket-perforated text-primary fs-3"></i>
+                </div>
+                <div>
+                    <h6 class="text-muted mb-1">Total Tickets</h6>
+                    <h3 class="fw-bold mb-0">{{ ticket_count }}</h3>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="card stat-card border-success p-3">
+            <div class="d-flex align-items-center">
+                <div class="rounded-circle bg-success bg-opacity-10 p-3 me-3">
+                    <i class="bi bi-people text-success fs-3"></i>
+                </div>
+                <div>
+                    <h6 class="text-muted mb-1">Empleados</h6>
+                    <h3 class="fw-bold mb-0">{{ employee_count }}</h3>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="card stat-card border-info p-3">
+            <div class="d-flex align-items-center">
+                <div class="rounded-circle bg-info bg-opacity-10 p-3 me-3">
+                    <i class="bi bi-person-gear text-info fs-3"></i>
+                </div>
+                <div>
+                    <h6 class="text-muted mb-1">Técnicos</h6>
+                    <h3 class="fw-bold mb-0">{{ technician_count }}</h3>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-md-12">
+        <div class="card">
+            <div class="card-header d-flex justify-content-between align-items-center">
+                <span>Tickets Recientes</span>
+                <a href="{{ url_for('ticket.list') }}" class="btn btn-sm btn-outline-primary">Ver todos</a>
+            </div>
+            <div class="card-body">
+                <div class="table-responsive">
+                    <table class="table table-hover">
+                        <thead>
+                            <tr>
+                                <th>ID</th>
+                                <th>Descripción</th>
+                                <th>Solicitante</th>
+                                <th>Prioridad</th>
+                                <th>Estado</th>
+                                <th>Fecha</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for ticket in recent_tickets %}
+                            <tr>
+                                <td>#{{ ticket.id }}</td>
+                                <td>{{ ticket.descripcion[:50] }}...</td>
+                                <td>{{ ticket.solicitante.nombre }}</td>
+                                <td>
+                                    <span class="badge {% if ticket.prioridad == 'Crítica' %}bg-danger{% elif ticket.prioridad == 'Alta' %}bg-warning{% else %}bg-info{% endif %}">
+                                        {{ ticket.prioridad }}
+                                    </span>
+                                </td>
+                                <td>
+                                    <span class="badge bg-secondary">{{ ticket.estado }}</span>
+                                </td>
+                                <td>{{ ticket.fecha_creacion.strftime('%Y-%m-%d') }}</td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

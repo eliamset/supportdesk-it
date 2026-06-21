@@ -1,0 +1,142 @@
+{% extends "base.html" %}
+
+{% block title %}Ticket #{{ ticket.id }}{% endblock %}
+{% block page_title %}Detalle del Ticket #{{ ticket.id }}{% endblock %}
+
+{% block content %}
+<div class="row">
+    <!-- Información General -->
+    <div class="col-md-4">
+        <div class="card mb-4">
+            <div class="card-header">Datos del Ticket</div>
+            <div class="card-body">
+                <p><strong>Estado:</strong> <span class="badge bg-secondary">{{ ticket.estado }}</span></p>
+                <p><strong>Prioridad:</strong> 
+                    <span class="badge {% if ticket.prioridad == 'Crítica' %}bg-danger{% elif ticket.prioridad == 'Alta' %}bg-warning{% else %}bg-info{% endif %}">
+                        {{ ticket.prioridad }}
+                    </span>
+                </p>
+                <p><strong>Categoría:</strong> {{ ticket.categoria.nombre_categoria }}</p>
+                <p><strong>Creado:</strong> {{ ticket.fecha_creacion.strftime('%Y-%m-%d %H:%M') }}</p>
+                {% if ticket.fecha_cierre %}
+                <p><strong>Cerrado:</strong> {{ ticket.fecha_cierre.strftime('%Y-%m-%d %H:%M') }}</p>
+                <p><strong>Días de Resolución:</strong> {{ ticket.tiempo_resolucion_dias }} días</p>
+                {% endif %}
+                <hr>
+                <p><strong>Solicitante:</strong> {{ ticket.solicitante.nombre }}</p>
+                <p><strong>Área:</strong> {{ ticket.solicitante.area }}</p>
+            </div>
+        </div>
+
+        {% if ticket.estado != 'Cerrado' %}
+        <!-- Acciones de Estado -->
+        <div class="card mb-4">
+            <div class="card-header">Gestión de Estado</div>
+            <div class="card-body">
+                <form action="{{ url_for('ticket.update_status', id=ticket.id) }}" method="POST" class="mb-3">
+                    <div class="input-group">
+                        <select name="estado" class="form-select">
+                            <option value="Abierto" {% if ticket.estado == 'Abierto' %}selected{% endif %}>Abierto</option>
+                            <option value="En progreso" {% if ticket.estado == 'En progreso' %}selected{% endif %}>En progreso</option>
+                            <option value="En espera" {% if ticket.estado == 'En espera' %}selected{% endif %}>En espera</option>
+                            <option value="Resuelto" {% if ticket.estado == 'Resuelto' %}selected{% endif %}>Resuelto</option>
+                            <option value="Cerrado" {% if ticket.estado == 'Cerrado' %}selected{% endif %}>Cerrado</option>
+                        </select>
+                        <button type="submit" class="btn btn-primary">Actualizar</button>
+                    </div>
+                </form>
+
+                {% if ticket.estado in ['Abierto', 'En espera'] %}
+                <form action="{{ url_for('ticket.update_priority', id=ticket.id) }}" method="POST">
+                    <div class="input-group">
+                        <select name="prioridad" class="form-select">
+                            <option value="Baja" {% if ticket.prioridad == 'Baja' %}selected{% endif %}>Baja</option>
+                            <option value="Media" {% if ticket.prioridad == 'Media' %}selected{% endif %}>Media</option>
+                            <option value="Alta" {% if ticket.prioridad == 'Alta' %}selected{% endif %}>Alta</option>
+                            <option value="Crítica" {% if ticket.prioridad == 'Crítica' %}selected{% endif %}>Crítica</option>
+                        </select>
+                        <button type="submit" class="btn btn-warning">Cambiar Prioridad</button>
+                    </div>
+                </form>
+                {% endif %}
+            </div>
+        </div>
+
+        <!-- Asignación de Técnicos -->
+        <div class="card">
+            <div class="card-header">Asignar Técnico</div>
+            <div class="card-body">
+                <form action="{{ url_for('ticket.assign', id=ticket.id) }}" method="POST">
+                    <div class="input-group">
+                        <select name="tecnico_id" class="form-select" required>
+                            <option value="">Seleccionar técnico...</option>
+                            {% for tech in tecnicos %}
+                            <option value="{{ tech.id }}">{{ tech.nombre }} ({{ tech.especialidad }})</option>
+                            {% endfor %}
+                        </select>
+                        <button type="submit" class="btn btn-info text-white">Asignar</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+        {% endif %}
+    </div>
+
+    <!-- Descripción e Intervenciones -->
+    <div class="col-md-8">
+        <div class="card mb-4">
+            <div class="card-header">Descripción</div>
+            <div class="card-body">
+                <p class="lead">{{ ticket.descripcion }}</p>
+            </div>
+        </div>
+
+        <div class="card mb-4">
+            <div class="card-header">Intervenciones</div>
+            <div class="card-body">
+                {% if ticket.intervenciones %}
+                <ul class="list-group list-group-flush">
+                    {% for int in ticket.intervenciones %}
+                    <li class="list-group-item px-0">
+                        <div class="d-flex justify-content-between">
+                            <h6 class="fw-bold mb-1">{{ int.tecnico_actuante.nombre }}</h6>
+                            <small class="text-muted">{{ int.fecha.strftime('%Y-%m-%d %H:%M') }}</small>
+                        </div>
+                        <p class="mb-0">{{ int.descripcion }}</p>
+                    </li>
+                    {% endfor %}
+                </ul>
+                {% else %}
+                <p class="text-muted italic">No hay intervenciones registradas aún.</p>
+                {% endif %}
+
+                {% if ticket.estado != 'Cerrado' %}
+                <hr>
+                <form action="{{ url_for('ticket.add_intervention', id=ticket.id) }}" method="POST" class="mt-3">
+                    <div class="mb-3">
+                        <label class="form-label">Nueva Intervención</label>
+                        <select name="tecnico_id" class="form-select mb-2" required>
+                            <option value="">¿Quién realiza la intervención?</option>
+                            {% for tech in ticket.tecnicos_asignados %}
+                            <option value="{{ tech.id }}">{{ tech.nombre }}</option>
+                            {% endfor %}
+                        </select>
+                        <textarea name="descripcion" class="form-control" rows="3" placeholder="Detalle lo realizado..." required></textarea>
+                    </div>
+                    <button type="submit" class="btn btn-success">Registrar Intervención</button>
+                </form>
+                {% endif %}
+            </div>
+        </div>
+
+        <div class="card">
+            <div class="card-header">Técnicos Asignados</div>
+            <div class="card-body">
+                {% for tech in ticket.tecnicos_asignados %}
+                <span class="badge bg-info p-2 me-1">{{ tech.nombre }}</span>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

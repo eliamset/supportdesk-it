@@ -1,0 +1,100 @@
+{% extends "base.html" %}
+
+{% block title %}Tickets{% endblock %}
+{% block page_title %}Gestión de Tickets{% endblock %}
+
+{% block content %}
+<div class="card mb-4">
+    <div class="card-body">
+        <form method="GET" class="row g-3">
+            <div class="col-md-3">
+                <label class="form-label">Estado</label>
+                <select name="estado" class="form-select">
+                    <option value="">Todos</option>
+                    <option value="Abierto">Abierto</option>
+                    <option value="En progreso">En progreso</option>
+                    <option value="En espera">En espera</option>
+                    <option value="Resuelto">Resuelto</option>
+                    <option value="Cerrado">Cerrado</option>
+                </select>
+            </div>
+            <div class="col-md-3">
+                <label class="form-label">Prioridad</label>
+                <select name="prioridad" class="form-select">
+                    <option value="">Todas</option>
+                    <option value="Baja">Baja</option>
+                    <option value="Media">Media</option>
+                    <option value="Alta">Alta</option>
+                    <option value="Crítica">Crítica</option>
+                </select>
+            </div>
+            <div class="col-md-3">
+                <label class="form-label">Técnico</label>
+                <select name="tecnico_id" class="form-select">
+                    <option value="">Todos</option>
+                    {% for tech in tecnicos %}
+                    <option value="{{ tech.id }}">{{ tech.nombre }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div class="col-md-3 d-flex align-items-end">
+                <button type="submit" class="btn btn-primary w-100">Filtrar</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<div class="card">
+    <div class="card-header d-flex justify-content-between align-items-center">
+        <span>Lista de Tickets</span>
+        <a href="{{ url_for('ticket.create') }}" class="btn btn-primary btn-sm">Nuevo Ticket</a>
+    </div>
+    <div class="card-body">
+        <div class="table-responsive">
+            <table class="table table-hover">
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>Solicitante</th>
+                        <th>Categoría</th>
+                        <th>Prioridad</th>
+                        <th>Estado</th>
+                        <th>Fecha</th>
+                        <th>Acciones</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for t in tickets %}
+                    <tr>
+                        <td>#{{ t.id }}</td>
+                        <td>{{ t.solicitante.nombre }}</td>
+                        <td>{{ t.categoria.nombre_categoria }}</td>
+                        <td>
+                            <span class="badge {% if t.prioridad == 'Crítica' %}bg-danger{% elif t.prioridad == 'Alta' %}bg-warning{% else %}bg-info{% endif %}">
+                                {{ t.prioridad }}
+                            </span>
+                        </td>
+                        <td>
+                            <span class="badge bg-secondary">{{ t.estado }}</span>
+                        </td>
+                        <td>{{ t.fecha_creacion.strftime('%Y-%m-%d') }}</td>
+                        <td>
+                            <a href="{{ url_for('ticket.view', id=t.id) }}" class="btn btn-sm btn-primary">
+                                <i class="bi bi-eye"></i> Ver Detalle
+                            </a>
+                            {% if current_user.rol in ['admin', 'tecnico'] %}
+                            <form method="POST" action="{{ url_for('ticket.delete', id=t.id) }}" style="display:inline;">
+                                <button type="submit" class="btn btn-sm btn-danger ms-1" onclick="return confirm('¿Estás seguro de eliminar el ticket #{{ t.id }} y todo su historial? Esta acción no se puede deshacer.');">
+                                    <i class="bi bi-trash"></i>
+                                </button>
+                            </form>
+                            {% endif %}
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+{% endblock %}

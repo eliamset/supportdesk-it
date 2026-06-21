@@ -1,0 +1,56 @@
+{% extends "base.html" %}
+
+{% block title %}Reportes{% endblock %}
+{% block page_title %}Reportes y Métricas{% endblock %}
+
+{% block content %}
+<div class="row mb-4">
+    <div class="col-md-6">
+        <div class="card">
+            <div class="card-header">Tickets por Estado</div>
+            <div class="card-body">
+                <ul class="list-group list-group-flush">
+                    {% for status, count in status_counts %}
+                    <li class="list-group-item d-flex justify-content-between align-items-center">
+                        {{ status }}
+                        <span class="badge bg-primary rounded-pill">{{ count }}</span>
+                    </li>
+                    {% endfor %}
+                </ul>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-md-12">
+        <div class="card">
+            <div class="card-header">Desempeño de Técnicos</div>
+            <div class="card-body">
+                <div class="table-responsive">
+                    <table class="table table-hover">
+                        <thead>
+                            <tr>
+                                <th>Técnico</th>
+                                <th>Resueltos/Cerrados</th>
+                                <th>Pendientes</th>
+                                <th>Tiempo Promedio (Días)</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for stat in tech_stats %}
+                            <tr>
+                                <td>{{ stat.nombre }}</td>
+                                <td><span class="text-success fw-bold">{{ stat.resueltos }}</span></td>
+                                <td><span class="text-warning fw-bold">{{ stat.pendientes }}</span></td>
+                                <td>{{ stat.avg_time }}</td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

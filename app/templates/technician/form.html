@@ -1,0 +1,36 @@
+{% extends "base.html" %}
+
+{% block title %}{{ title }}{% endblock %}
+{% block page_title %}{{ title }}{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-md-6">
+        <div class="card">
+            <div class="card-body">
+                <form method="POST">
+                    <div class="mb-3">
+                        <label class="form-label">Nombre del Técnico</label>
+                        <input type="text" name="nombre" class="form-control" value="{{ technician.nombre if technician else '' }}" required>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Especialidad</label>
+                        <input type="text" name="especialidad" class="form-control" value="{{ technician.especialidad if technician else '' }}" placeholder="Ej: Redes, Hardware, SQL" required>
+                    </div>
+                    <div class="mb-4">
+                        <label class="form-label">Estado</label>
+                        <select name="estado" class="form-select">
+                            <option value="activo" {% if technician and technician.estado == 'activo' %}selected{% endif %}>Activo</option>
+                            <option value="inactivo" {% if technician and technician.estado == 'inactivo' %}selected{% endif %}>Inactivo</option>
+                        </select>
+                    </div>
+                    <div class="d-grid gap-2">
+                        <button type="submit" class="btn btn-primary">Guardar Registro</button>
+                        <a href="{{ url_for('technician.list') }}" class="btn btn-outline-secondary">Cancelar</a>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

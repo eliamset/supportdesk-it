@@ -1,0 +1,42 @@
+{% extends "base.html" %}
+
+{% block title %}Categorías{% endblock %}
+{% block page_title %}Categorías de Incidencia{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-md-8">
+        <div class="card">
+            <div class="card-header d-flex justify-content-between align-items-center">
+                <span>Lista de Categorías</span>
+                <a href="{{ url_for('category.create') }}" class="btn btn-primary btn-sm">Nueva Categoría</a>
+            </div>
+            <div class="card-body">
+                <table class="table table-hover">
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>Nombre</th>
+                            <th>Acciones</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for cat in categories %}
+                        <tr>
+                            <td>{{ cat.id }}</td>
+                            <td>{{ cat.nombre_categoria }}</td>
+                            <td>
+                                <a href="{{ url_for('category.update', id=cat.id) }}" class="btn btn-sm btn-info text-white">Editar</a>
+                                <form method="POST" action="{{ url_for('category.delete', id=cat.id) }}" style="display:inline;">
+                                    <button type="submit" class="btn btn-sm btn-danger" onclick="return confirm('¿Eliminar categoría?');">Eliminar</button>
+                                </form>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

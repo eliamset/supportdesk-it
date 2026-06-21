@@ -1,0 +1,90 @@
+{% extends "base.html" %}
+
+{% block title %}{{ title }}{% endblock %}
+{% block page_title %}{{ title }}{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-md-6">
+        <div class="card">
+            <div class="card-header">
+                <i class="bi bi-person-badge me-2"></i>{{ title }}
+            </div>
+            <div class="card-body">
+                <form method="POST">
+                    <!-- Usuario -->
+                    <div class="mb-3">
+                        <label class="form-label fw-semibold">Nombre de Usuario</label>
+                        <div class="input-group">
+                            <span class="input-group-text"><i class="bi bi-person"></i></span>
+                            <input type="text" name="username" class="form-control"
+                                   value="{{ user.username if user else '' }}"
+                                   placeholder="ej: tecnico03"
+                                   required>
+                        </div>
+                    </div>
+
+                    <!-- Rol -->
+                    <div class="mb-3">
+                        <label class="form-label fw-semibold">Rol en el Sistema</label>
+                        <div class="input-group">
+                            <span class="input-group-text"><i class="bi bi-shield"></i></span>
+                            <select name="rol" class="form-select" required>
+                                <option value="" disabled {% if not user %}selected{% endif %}>Seleccionar rol...</option>
+                                <option value="admin"    {% if user and user.rol == 'admin'    %}selected{% endif %}>Administrador</option>
+                                <option value="tecnico"  {% if user and user.rol == 'tecnico'  %}selected{% endif %}>Técnico</option>
+                                <option value="empleado" {% if user and user.rol == 'empleado' %}selected{% endif %}>Empleado</option>
+                            </select>
+                        </div>
+                        <small class="text-muted">
+                            <strong>Admin:</strong> acceso total |
+                            <strong>Técnico:</strong> gestiona tickets |
+                            <strong>Empleado:</strong> crea solicitudes
+                        </small>
+                    </div>
+
+                    <hr>
+
+                    <!-- Contraseña -->
+                    <div class="mb-3">
+                        <label class="form-label fw-semibold">
+                            Contraseña
+                            {% if user %}
+                                <span class="badge bg-secondary fw-normal">Dejar en blanco para no cambiar</span>
+                            {% endif %}
+                        </label>
+                        <div class="input-group">
+                            <span class="input-group-text"><i class="bi bi-lock"></i></span>
+                            <input type="password" name="password" class="form-control"
+                                   placeholder="Mínimo 6 caracteres"
+                                   {% if not user %}required{% endif %}>
+                        </div>
+                    </div>
+
+                    <!-- Confirmar Contraseña -->
+                    <div class="mb-4">
+                        <label class="form-label fw-semibold">Confirmar Contraseña</label>
+                        <div class="input-group">
+                            <span class="input-group-text"><i class="bi bi-lock-fill"></i></span>
+                            <input type="password" name="confirm_password" class="form-control"
+                                   placeholder="Repite la contraseña"
+                                   {% if not user %}required{% endif %}>
+                        </div>
+                    </div>
+
+                    <!-- Botones -->
+                    <div class="d-grid gap-2">
+                        <button type="submit" class="btn btn-primary">
+                            <i class="bi bi-floppy me-1"></i>
+                            {{ 'Actualizar Usuario' if user else 'Crear Usuario' }}
+                        </button>
+                        <a href="{{ url_for('user.list') }}" class="btn btn-outline-secondary">
+                            <i class="bi bi-arrow-left me-1"></i>Cancelar
+                        </a>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

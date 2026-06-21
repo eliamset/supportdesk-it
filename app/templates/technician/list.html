@@ -1,0 +1,54 @@
+{% extends "base.html" %}
+
+{% block title %}Técnicos{% endblock %}
+{% block page_title %}Gestión de Técnicos{% endblock %}
+
+{% block content %}
+<div class="card">
+    <div class="card-header d-flex justify-content-between align-items-center">
+        <span>Lista de Técnicos</span>
+        <a href="{{ url_for('technician.create') }}" class="btn btn-primary btn-sm">
+            <i class="bi bi-plus-lg me-1"></i>Nuevo Técnico
+        </a>
+    </div>
+    <div class="card-body">
+        <div class="table-responsive">
+            <table class="table table-hover">
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>Nombre</th>
+                        <th>Especialidad</th>
+                        <th>Estado</th>
+                        <th>Acciones</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for tech in technicians %}
+                    <tr>
+                        <td>{{ tech.id }}</td>
+                        <td>{{ tech.nombre }}</td>
+                        <td>{{ tech.especialidad }}</td>
+                        <td>
+                            <span class="badge {% if tech.estado == 'activo' %}bg-success{% else %}bg-danger{% endif %}">
+                                {{ tech.estado }}
+                            </span>
+                        </td>
+                        <td>
+                            <a href="{{ url_for('technician.update', id=tech.id) }}" class="btn btn-sm btn-info text-white">
+                                <i class="bi bi-pencil"></i>
+                            </a>
+                            {% if current_user.rol == 'admin' %}
+                            <form method="POST" action="{{ url_for('technician.delete', id=tech.id) }}" style="display:inline;">
+                                <button type="submit" class="btn btn-sm btn-danger" onclick="return confirm('¿Eliminar técnico? Esta acción eliminará su registro de los tickets asignados e intervenciones.');"><i class="bi bi-trash"></i></button>
+                            </form>
+                            {% endif %}
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+{% endblock %}

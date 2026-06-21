@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SupportDesk IT - {% block title %}{% endblock %}</title>
+    <!-- Bootstrap 5 CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <!-- Bootstrap Icons -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    {% block extra_css %}{% endblock %}
+</head>
+<body>
+    {% if current_user.is_authenticated %}
+    <div class="d-flex" id="wrapper">
+        <!-- Sidebar -->
+        <div class="bg-dark text-white" id="sidebar-wrapper">
+            <div class="sidebar-heading text-center py-4 primary-text fs-4 fw-bold text-uppercase border-bottom">
+                <i class="bi bi-headset me-2"></i>SupportDesk
+            </div>
+            <div class="list-group list-group-flush my-3">
+                <a href="{{ url_for('main.index') }}" class="list-group-item list-group-item-action bg-transparent second-text fw-bold {% if request.endpoint == 'main.index' %}active{% endif %}">
+                    <i class="bi bi-speedometer2 me-2"></i>Dashboard
+                </a>
+                <a href="{{ url_for('ticket.list') }}" class="list-group-item list-group-item-action bg-transparent second-text fw-bold {% if 'ticket' in request.endpoint %}active{% endif %}">
+                    <i class="bi bi-ticket-perforated me-2"></i>Tickets
+                </a>
+                <a href="{{ url_for('employee.list') }}" class="list-group-item list-group-item-action bg-transparent second-text fw-bold {% if 'employee' in request.endpoint %}active{% endif %}">
+                    <i class="bi bi-people me-2"></i>Empleados
+                </a>
+                <a href="{{ url_for('technician.list') }}" class="list-group-item list-group-item-action bg-transparent second-text fw-bold {% if 'technician' in request.endpoint %}active{% endif %}">
+                    <i class="bi bi-person-gear me-2"></i>Técnicos
+                </a>
+                <a href="{{ url_for('category.list') }}" class="list-group-item list-group-item-action bg-transparent second-text fw-bold {% if 'category' in request.endpoint %}active{% endif %}">
+                    <i class="bi bi-tags me-2"></i>Categorías
+                </a>
+                <a href="{{ url_for('report.index') }}" class="list-group-item list-group-item-action bg-transparent second-text fw-bold {% if 'report' in request.endpoint %}active{% endif %}">
+                    <i class="bi bi-graph-up me-2"></i>Reportes
+                </a>
+                {% if current_user.rol == 'admin' %}
+                <a href="{{ url_for('user.list') }}" class="list-group-item list-group-item-action bg-transparent second-text fw-bold {% if 'user' in request.endpoint %}active{% endif %}">
+                    <i class="bi bi-shield-lock me-2"></i>Usuarios
+                </a>
+                {% endif %}
+                <a href="{{ url_for('auth.logout') }}" class="list-group-item list-group-item-action bg-transparent text-danger fw-bold">
+                    <i class="bi bi-box-arrow-left me-2"></i>Cerrar Sesión
+                </a>
+            </div>
+        </div>
+        <!-- /#sidebar-wrapper -->
+
+        <!-- Page Content -->
+        <div id="page-content-wrapper">
+            <nav class="navbar navbar-expand-lg navbar-light bg-transparent py-4 px-4">
+                <div class="d-flex align-items-center w-100">
+                    <i class="bi bi-text-left primary-text fs-4 me-3" id="menu-toggle"></i>
+                    <h2 class="fs-2 m-0">{% block page_title %}{% endblock %}</h2>
+                    <!-- Traductor de Google -->
+                    <div id="google_translate_element" class="ms-auto"></div>
+                </div>
+            </nav>
+
+            <!-- Script de Google Translate -->
+            <script type="text/javascript">
+                function googleTranslateElementInit() {
+                    new google.translate.TranslateElement({pageLanguage: 'es', layout: google.translate.TranslateElement.InlineLayout.SIMPLE}, 'google_translate_element');
+                }
+            </script>
+            <script type="text/javascript" src="//translate.google.com/translate_a/element.js?cb=googleTranslateElementInit"></script>
+
+            <div class="container-fluid px-4">
+                {% with messages = get_flashed_messages(with_categories=true) %}
+                  {% if messages %}
+                    {% for category, message in messages %}
+                      <div class="alert alert-{{ category }} alert-dismissible fade show" role="alert">
+                        {{ message }}
+                        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                      </div>
+                    {% endfor %}
+                  {% endif %}
+                {% endwith %}
+
+                {% block content %}{% endblock %}
+            </div>
+        </div>
+    </div>
+    {% else %}
+        {% block login_content %}{% endblock %}
+    {% endif %}
+
+    <!-- Scripts -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        var el = document.getElementById("wrapper");
+        var toggleButton = document.getElementById("menu-toggle");
+
+        if (toggleButton) {
+            toggleButton.onclick = function () {
+                el.classList.toggle("toggled");
+            };
+        }
+    </script>
+    {% block extra_js %}{% endblock %}
+</body>
+</html>
