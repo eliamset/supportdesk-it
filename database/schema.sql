@@ -4,7 +4,7 @@ USE supportdesk_db;
 -- Tabla de Usuarios (Autenticación)
 CREATE TABLE IF NOT EXISTS usuarios (
     id_usuario INT AUTO_INCREMENT PRIMARY KEY,
-    username VARCHAR(50) UNIQUE NOT NULL,
+    username VARCHAR(50) UNIQUE NOT NULL CHECK (username REGEXP '^[a-zA-Z0-9_]+$'),
     password VARCHAR(255) NOT NULL,
     rol ENUM('admin', 'tecnico', 'empleado') DEFAULT 'tecnico'
 );
@@ -12,16 +12,16 @@ CREATE TABLE IF NOT EXISTS usuarios (
 -- Tabla de Empleados
 CREATE TABLE IF NOT EXISTS empleados (
     id_empleado INT AUTO_INCREMENT PRIMARY KEY,
-    nombre VARCHAR(100) NOT NULL,
+    nombre VARCHAR(100) NOT NULL CHECK (nombre REGEXP '^[a-zA-ZáéíóúÁÉÍÓÚñÑ ]+$'),
     area VARCHAR(100) NOT NULL,
-    correo VARCHAR(100) UNIQUE NOT NULL,
-    telefono VARCHAR(20)
+    correo VARCHAR(100) UNIQUE NOT NULL CHECK (correo REGEXP '^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,}$'),
+    telefono VARCHAR(20) CHECK (telefono REGEXP '^[0-9+ -]+$')
 );
 
 -- Tabla de Técnicos
 CREATE TABLE IF NOT EXISTS tecnicos (
     id_tecnico INT AUTO_INCREMENT PRIMARY KEY,
-    nombre VARCHAR(100) NOT NULL,
+    nombre VARCHAR(100) NOT NULL CHECK (nombre REGEXP '^[a-zA-ZáéíóúÁÉÍÓÚñÑ ]+$'),
     especialidad VARCHAR(100) NOT NULL,
     estado ENUM('activo', 'inactivo') DEFAULT 'activo'
 );
@@ -29,7 +29,7 @@ CREATE TABLE IF NOT EXISTS tecnicos (
 -- Tabla de Categorías
 CREATE TABLE IF NOT EXISTS categorias (
     id_categoria INT AUTO_INCREMENT PRIMARY KEY,
-    nombre_categoria VARCHAR(100) NOT NULL
+    nombre_categoria VARCHAR(100) NOT NULL CHECK (nombre_categoria REGEXP '^[a-zA-Z0-9áéíóúÁÉÍÓÚñÑ ]+$')
 );
 
 -- Tabla de Tickets

@@ -1,3 +1,4 @@
+import re
 from flask import Blueprint, render_template, request, redirect, url_for, flash
 from flask_login import login_required
 from app.models.employee import Empleado
@@ -20,6 +21,16 @@ def create():
         correo = request.form.get('correo')
         telefono = request.form.get('telefono')
         
+        if not re.match(r'^[a-zA-ZáéíóúÁÉÍÓÚñÑ\s]+$', nombre):
+            flash('Error: El nombre contiene caracteres inválidos o emojis.', 'danger')
+            return render_template('employee/form.html', title='Nuevo Empleado')
+        if not re.match(r'^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$', correo):
+            flash('Error: Formato de correo electrónico inválido.', 'danger')
+            return render_template('employee/form.html', title='Nuevo Empleado')
+        if telefono and not re.match(r'^[0-9+\-\s]+$', telefono):
+            flash('Error: El teléfono contiene caracteres inválidos.', 'danger')
+            return render_template('employee/form.html', title='Nuevo Empleado')
+        
         new_employee = Empleado(nombre=nombre, area=area, correo=correo, telefono=telefono)
         db.session.add(new_employee)
         db.session.commit()
@@ -33,10 +44,24 @@ def create():
 def update(id):
     employee = Empleado.query.get_or_404(id)
     if request.method == 'POST':
-        employee.nombre = request.form.get('nombre')
+        nombre = request.form.get('nombre')
+        correo = request.form.get('correo')
+        telefono = request.form.get('telefono')
+        
+        if not re.match(r'^[a-zA-ZáéíóúÁÉÍÓÚñÑ\s]+$', nombre):
+            flash('Error: El nombre contiene caracteres inválidos o emojis.', 'danger')
+            return render_template('employee/form.html', employee=employee, title='Editar Empleado')
+        if not re.match(r'^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$', correo):
+            flash('Error: Formato de correo electrónico inválido.', 'danger')
+            return render_template('employee/form.html', employee=employee, title='Editar Empleado')
+        if telefono and not re.match(r'^[0-9+\-\s]+$', telefono):
+            flash('Error: El teléfono contiene caracteres inválidos.', 'danger')
+            return render_template('employee/form.html', employee=employee, title='Editar Empleado')
+            
+        employee.nombre = nombre
         employee.area = request.form.get('area')
-        employee.correo = request.form.get('correo')
-        employee.telefono = request.form.get('telefono')
+        employee.correo = correo
+        employee.telefono = telefono
         db.session.commit()
         flash('Empleado actualizado', 'success')
         return redirect(url_for('employee.list'))

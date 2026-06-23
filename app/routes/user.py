@@ -1,3 +1,4 @@
+import re
 from flask import Blueprint, render_template, request, redirect, url_for, flash
 from flask_login import login_required, current_user
 from app.models.user import Usuario
@@ -40,6 +41,10 @@ def create():
         if not username or not password or not rol:
             flash('Todos los campos son obligatorios.', 'danger')
             return render_template('user/form.html', title='Nuevo Usuario')
+            
+        if not re.match(r'^[a-zA-Z0-9_]+$', username):
+            flash('Error: El nombre de usuario solo puede contener letras, números y guiones bajos (sin espacios ni emojis).', 'danger')
+            return render_template('user/form.html', title='Nuevo Usuario')
 
         if password != confirm:
             flash('Las contraseñas no coinciden.', 'danger')
@@ -77,6 +82,10 @@ def update(id):
 
         if not username or not rol:
             flash('El nombre de usuario y el rol son obligatorios.', 'danger')
+            return render_template('user/form.html', user=user, title='Editar Usuario')
+            
+        if not re.match(r'^[a-zA-Z0-9_]+$', username):
+            flash('Error: El nombre de usuario solo puede contener letras, números y guiones bajos (sin espacios ni emojis).', 'danger')
             return render_template('user/form.html', user=user, title='Editar Usuario')
 
         # Verificar duplicado de username (excluyendo al mismo usuario)

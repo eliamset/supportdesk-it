@@ -1,3 +1,4 @@
+import re
 from flask import Blueprint, render_template, request, redirect, url_for, flash
 from flask_login import login_required
 from app.models.technician import Tecnico
@@ -19,6 +20,10 @@ def create():
         especialidad = request.form.get('especialidad')
         estado = request.form.get('estado')
         
+        if not re.match(r'^[a-zA-ZáéíóúÁÉÍÓÚñÑ\s]+$', nombre):
+            flash('Error: El nombre contiene caracteres inválidos o emojis.', 'danger')
+            return render_template('technician/form.html', title='Nuevo Técnico')
+            
         new_tech = Tecnico(nombre=nombre, especialidad=especialidad, estado=estado)
         db.session.add(new_tech)
         db.session.commit()
@@ -32,7 +37,12 @@ def create():
 def update(id):
     tech = Tecnico.query.get_or_404(id)
     if request.method == 'POST':
-        tech.nombre = request.form.get('nombre')
+        nombre = request.form.get('nombre')
+        if not re.match(r'^[a-zA-ZáéíóúÁÉÍÓÚñÑ\s]+$', nombre):
+            flash('Error: El nombre contiene caracteres inválidos o emojis.', 'danger')
+            return render_template('technician/form.html', technician=tech, title='Editar Técnico')
+            
+        tech.nombre = nombre
         tech.especialidad = request.form.get('especialidad')
         tech.estado = request.form.get('estado')
         db.session.commit()
